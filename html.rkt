@@ -224,3 +224,14 @@
   `(video ,attr* . ,html*))
 (define (Wbr #:attr* [attr* '()] . html*)
   `(wbr ,attr* . ,html*))
+(define (Prelude #:title [title "index"] #:css [css #f] . body*)
+  (Html
+   (Head
+    (Meta #:attr* '((charset "utf-8")))
+    (Title title)
+    (if css
+        (Link #:attr* `((href ,css) (rel "stylesheet")))
+        ""))
+   (apply Body body*)))
+(define (CodeB str)
+  (Pre (Code str)))
