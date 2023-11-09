@@ -665,6 +665,10 @@
   (brac0 (apply &cm x*)))
 (define (&abs x) (vert0 x))
 (define (&norm x) (Vert0 x))
+(define (ap f . x*)
+  (&af f (apply tupl0 x*)))
+(define (app f . x*)
+  (&af f (apply brac0 x*)))
 (define (tag? l x)
   (and (pair? l)
        (eq? (car l) x)))
@@ -679,23 +683,53 @@
   (define (D d)
     (if (tag? d 'mtd) d (Mtd d)))
   `(mtable ,attr* . ,(map R row*)))
+(define-syntax &Mtable
+  (syntax-rules ()
+    ((_ #:attr* attr* (x ...) ...)
+     (&mtable #:attr* attr* (list x ...) ...))
+    ((_ (x ...) ...)
+     (&mtable (list x ...) ...))))
 (define (&matrix #:attr* [attr* '()] . row*)
   (brack
    (keyword-apply
     &mtable '(#:attr*) (list attr*) row*)))
+(define-syntax &Matrix
+  (syntax-rules ()
+    ((_ #:attr* attr* (x ...) ...)
+     (&matrix #:attr* attr* (list x ...) ...))
+    ((_ (x ...) ...)
+     (&matrix (list x ...) ...))))
 (define (&matrix0 #:attr* [attr* '()] . row*)
   (paren
    (keyword-apply
     &mtable '(#:attr*) (list attr*) row*)))
+(define-syntax &Matrix0
+  (syntax-rules ()
+    ((_ #:attr* attr* (x ...) ...)
+     (&matrix0 #:attr* attr* (list x ...) ...))
+    ((_ (x ...) ...)
+     (&matrix0 (list x ...) ...))))
 (define (&det #:attr* [attr* '()] . row*)
   (Verti
    (keyword-apply
     &mtable '(#:attr*) (list attr*) row*)))
+(define-syntax &Det
+  (syntax-rules ()
+    ((_ #:attr* attr* (x ...) ...)
+     (&det #:attr* attr* (list x ...) ...))
+    ((_ (x ...) ...)
+     (&det (list x ...) ...))))
 (define (&choice #:attr* [attr* '()] . row*)
   (Mrow
    o.lcurly
    (keyword-apply
     &mtable '(#:attr*) (list attr*) row*)))
+(define-syntax &Choice
+  (syntax-rules ()
+    ((_ #:attr* attr* (x ...) ...)
+     (&choice #:attr* attr* (list x ...) ...))
+    ((_ (x ...) ...)
+     (&choice (list x ...) ...))))
 (define (&choice0 #:attr* [attr* '()] . row*)
   (Mrow
    o.lcurly
@@ -706,3 +740,51 @@
                  (Mtd #:attr* '((columnalign "left"))
                       (&cm1 (cadr row)))))
          row*))))
+(define-syntax &Choice0
+  (syntax-rules ()
+    ((_ #:attr* attr* (x ...) ...)
+     (&choice0 #:attr* attr* (list x ...) ...))
+    ((_ (x ...) ...)
+     (&choice0 (list x ...) ...))))
+(define ((definition #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "definition")))
+   (B (format "定义~a." n)) " " x*))
+(define ((lemma #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "lemma")))
+   (B (format "引理~a." n)) " " x*))
+(define ((theorem #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "theorem")))
+   (B (format "定理~a." n)) " " x*))
+(define ((corollary #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "corollary")))
+   (B (format "推论~a." n)) " " x*))
+(define ((example #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "example")))
+   (B (format "例子~a." n)) " " x*))
+(define ((notation #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "notation")))
+   (B (format "记号~a." n)) " " x*))
+(define ((comment #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "comment")))
+   (B (format "注记~a." n)) " " x*))
+(define ((program #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "program")))
+   (B (format "程序~a." n)) " " x*))
+(define ((exercise #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "exercise")))
+   (B (format "练习~a." n)) " " x*))
+(define Q.E.D.
+  (Div (B "Q.E.D." ) #:attr* '((style "text-align: right;"))))
+(define ((proof #:n [n ""]) . x*)
+  (keyword-apply
+   Div '(#:attr*) '(((class "proof")))
+   (B (format "证明~a." n)) " " `(,@x* ,Q.E.D.)))
