@@ -396,12 +396,12 @@
   (lambda (x) (error id "~s" x)))
 (define (make-infix0 op id)
   (make-op op
-    (err0 id)
-    (err1 id)))
+           (err0 id)
+           (err1 id)))
 (define (make-infix1 op id)
   (make-op op
-    (err0 id)
-    (lambda (x) (Mrow op x))))
+           (err0 id)
+           (lambda (x) (Mrow op x))))
 (define ((make-infix2 op) x y)
   (Mrow x op y))
 (define ((make-prefix op) x)
@@ -572,16 +572,16 @@
   (&awconint o.awconint))
 (define &comma
   (make-op o.comma
-    (lambda () ?)
-    (lambda (x) x)))
+           (lambda () ?)
+           (lambda (x) x)))
 (define &cm &comma)
 (define (&comma1 x)
   (Mrow o.comma x))
 (define &cm1 &comma1)
 (define &lowast
   (make-op o.lowast
-    (lambda () (err0 '&lowast))
-    (lambda (x) (Msup x o.lowast))))
+           (lambda () (err0 '&lowast))
+           (lambda (x) (Msup x o.lowast))))
 (define &* &lowast)
 (define (&prime x)
   (Msup x o.prime))
@@ -748,6 +748,31 @@
      (&choice0 #:attr* attr* (list x ...) ...))
     ((_ (x ...) ...)
      (&choice0 (list x ...) ...))))
+(define (&deriv #:attr* [attr* '()] x -> y . l*)
+  (define (make-line x -> y)
+    (list x -> (Mtd #:attr* '((columnalign "left")) y)))
+  (define line*
+    (if (null? l*)
+        '()
+        (let iter ((-> (car l*))
+                   (z (cadr l*))
+                   (l* (cddr l*))
+                   (r '()))
+          (if (null? l*)
+              (reverse
+               (cons (make-line ? -> z) r))
+              (iter (car l*) (cadr l*) (cddr l*)
+                    (cons (make-line ? -> z) r))))))
+  (keyword-apply
+   &mtable '(#:attr*) (list attr*)
+   (cons (make-line x -> y) line*)))
+(define (&deriv= #:attr* [attr* '()] x y . z*)
+  (define (make-line x y)
+    (list x o.= (Mtd #:attr* '((columnalign "left")) y)))
+  (keyword-apply
+   &mtable '(#:attr*) (list attr*)
+   (cons (make-line x y)
+         (map (lambda (z) (make-line ? z)) z*))))
 (define ((definition #:n [n ""]) . x*)
   (keyword-apply
    Div '(#:attr*) '(((class "definition")))
